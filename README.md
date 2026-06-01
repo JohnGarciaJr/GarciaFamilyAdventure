@@ -5,7 +5,7 @@ A little single-page website that counts down to our family trip to
 8-bit "side quest" callout for our **Universal Studios / Super Nintendo Land**
 day. Built as a self-contained `index.html` so it can run anywhere with no setup.
 
-🔗 **Live site:** _add your Netlify URL here once deployed_
+🔗 **Live site:** <https://garciafamilyadventurecountdown.netlify.app/>
 
 ## Features
 
