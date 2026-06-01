@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Garcia Family Adventure</title>
+
+<!-- ============================================================
+     EASY EDITS — change these and nothing else:
+     - Departure date/time:  see TRIP below in the <script>
+     - Countdown start date:  see START below in the <script>
+     - Resort name & dates, the "side quest" text: search the HTML
+     ============================================================ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Quicksand:wght@400;500;600;700&family=Fredoka:wght@500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --night-deep:#0b0828;
+    --night:#1a1248;
+    --twilight:#3a1f6e;
+    --glow-magenta:#ff5fa2;
+    --glow-orange:#ffb05e;
+    --star:#fff4d6;
+    --gold:#ffd35c;
+    --text:#f6f1ff;
+    --muted:#c3b8e6;
+
+    --px-red:#e8413a;
+    --px-blue:#3da9fc;
+    --px-yellow:#ffd93d;
+    --px-green:#49d36f;
+    --px-coin:#ffcf33;
+    --px-dark:#15152b;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html,body{height:100%;}
+  body{
+    font-family:'Quicksand',sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(ellipse 120% 80% at 50% 110%, var(--glow-magenta) 0%, rgba(255,95,162,0) 45%),
+      radial-gradient(ellipse 90% 60% at 50% 118%, var(--glow-orange) 0%, rgba(255,176,94,0) 40%),
+      linear-gradient(180deg, var(--night-deep) 0%, var(--night) 38%, var(--twilight) 100%);
+    min-height:100%;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ---------- starfield + fireworks layers ---------- */
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+  .star{
+    position:absolute;border-radius:50%;background:var(--star);
+    animation:twinkle var(--dur,3s) ease-in-out infinite alternate;
+  }
+  @keyframes twinkle{from{opacity:.15;transform:scale(.6);}to{opacity:1;transform:scale(1);}}
+
+  #fireworks{position:fixed;inset:0;pointer-events:none;z-index:1;}
+  .spark{position:absolute;width:5px;height:5px;border-radius:50%;
+    animation:fly 1100ms ease-out forwards;}
+  @keyframes fly{
+    0%{transform:translate(0,0) scale(1);opacity:1;}
+    100%{transform:translate(var(--tx),var(--ty)) scale(.2);opacity:0;}
+  }
+
+  /* ---------- castle silhouette ---------- */
+  #castle{position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    width:min(900px,140%);z-index:1;pointer-events:none;opacity:.92;
+    filter:drop-shadow(0 0 28px rgba(255,95,162,.35));}
+
+  /* ---------- layout ---------- */
+  .wrap{position:relative;z-index:3;max-width:1000px;margin:0 auto;
+    padding:clamp(28px,5vw,72px) 20px 60px;text-align:center;}
+
+  .eyebrow{font-family:'Quicksand';letter-spacing:.42em;text-transform:uppercase;
+    font-size:clamp(11px,1.6vw,14px);color:var(--gold);font-weight:700;
+    opacity:0;animation:rise .8s .1s forwards;}
+
+  h1{font-family:'Cinzel Decorative',serif;font-weight:900;
+    font-size:clamp(34px,7vw,76px);line-height:1.05;margin:.18em 0 .1em;
+    background:linear-gradient(180deg,#fff 0%,var(--gold) 120%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 40px rgba(255,211,92,.25);
+    opacity:0;animation:rise .9s .25s forwards;}
+
+  .sub{font-size:clamp(15px,2.4vw,21px);color:var(--muted);font-weight:500;
+    opacity:0;animation:rise .9s .4s forwards;}
+  .sub b{color:#fff;font-weight:700;}
+
+  @keyframes rise{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
+
+  /* ---------- countdown ---------- */
+  .countdown{display:flex;justify-content:center;gap:clamp(10px,2.2vw,26px);
+    flex-wrap:wrap;margin:clamp(30px,5vw,52px) 0 8px;
+    opacity:0;animation:rise 1s .55s forwards;}
+  .unit{background:rgba(255,255,255,.06);border:1px solid rgba(255,211,92,.28);
+    border-radius:20px;padding:clamp(14px,2.5vw,26px) clamp(16px,3vw,34px);
+    min-width:clamp(78px,17vw,140px);backdrop-filter:blur(8px);
+    box-shadow:0 14px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);}
+  .num{font-family:'Fredoka',sans-serif;font-weight:700;
+    font-size:clamp(38px,8vw,72px);line-height:1;
+    color:#fff;text-shadow:0 0 22px rgba(255,95,162,.5);}
+  .lbl{font-family:'Quicksand';text-transform:uppercase;letter-spacing:.22em;
+    font-size:clamp(10px,1.5vw,13px);color:var(--gold);font-weight:700;margin-top:10px;}
+  #secUnit{transition:transform .15s ease;}
+  .tick{transform:scale(1.08);}
+
+  .leavemsg{font-size:clamp(14px,2.2vw,18px);color:var(--muted);margin-top:6px;
+    opacity:0;animation:rise 1s .7s forwards;}
+  .leavemsg b{color:var(--gold);}
+
+  /* ---------- progress ---------- */
+  .progress-wrap{max-width:560px;margin:30px auto 0;
+    opacity:0;animation:rise 1s .8s forwards;}
+  .bar{height:14px;border-radius:99px;background:rgba(255,255,255,.1);
+    overflow:hidden;border:1px solid rgba(255,255,255,.15);}
+  .fill{height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,var(--glow-magenta),var(--gold));
+    box-shadow:0 0 18px rgba(255,211,92,.6);transition:width 1s ease;}
+  .ptext{font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:.04em;}
+
+  /* ---------- info strip ---------- */
+  .strip{display:flex;justify-content:center;gap:clamp(14px,3vw,40px);
+    flex-wrap:wrap;margin:46px auto 0;
+    opacity:0;animation:rise 1s .9s forwards;}
+  .chip{display:flex;align-items:center;gap:10px;font-weight:600;
+    font-size:clamp(13px,1.8vw,16px);color:#fff;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
+    padding:12px 20px;border-radius:14px;}
+  .chip .ico{font-size:1.4em;line-height:1;}
+
+  /* ---------- SIDE QUEST: retro pixel card ---------- */
+  .quest{margin:clamp(40px,7vw,72px) auto 0;max-width:680px;text-align:left;
+    background:
+      repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 2px,transparent 2px 4px),
+      var(--px-dark);
+    border:4px solid var(--px-yellow);
+    box-shadow:0 0 0 4px var(--px-dark),0 0 0 8px var(--px-red),0 22px 50px rgba(0,0,0,.5);
+    border-radius:6px;padding:clamp(22px,4vw,34px);position:relative;
+    opacity:0;animation:rise 1s 1s forwards;}
+  .quest::before{content:"";position:absolute;inset:0;border-radius:2px;
+    background:repeating-linear-gradient(90deg,transparent 0 3px,rgba(0,0,0,.12) 3px 4px);
+    pointer-events:none;mix-blend-mode:overlay;}
+  .quest-tag{font-family:'Press Start 2P',monospace;font-size:clamp(10px,1.7vw,13px);
+    color:var(--px-yellow);text-shadow:2px 2px 0 var(--px-red);
+    display:flex;align-items:center;gap:10px;}
+  .blink{animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .quest h2{font-family:'Press Start 2P',monospace;color:#fff;
+    font-size:clamp(14px,2.6vw,20px);line-height:1.5;margin:18px 0 14px;
+    text-shadow:3px 3px 0 var(--px-blue);}
+  .quest p{font-family:'Quicksand';font-weight:600;color:#dfe7ff;
+    font-size:clamp(14px,2vw,16px);line-height:1.6;}
+  .quest p .hl{color:var(--px-green);font-weight:700;}
+  .pixrow{display:flex;gap:16px;align-items:center;margin-top:20px;}
+  .coin{width:26px;height:26px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff6c2,var(--px-coin) 60%,#c98f12);
+    box-shadow:0 0 0 3px #8a5e0a inset, 0 4px 0 #a06a0c;
+    animation:spin 1.6s linear infinite;}
+  .coin:nth-child(2){animation-delay:.2s;}
+  .coin:nth-child(3){animation-delay:.4s;}
+  @keyframes spin{0%{transform:rotateY(0);}50%{transform:rotateY(180deg) scaleX(.25);}100%{transform:rotateY(360deg);}}
+  .pheart{width:22px;height:22px;margin-left:auto;
+    background:
+      conic-gradient(from -45deg at 50% 65%, var(--px-red) 0 90deg, transparent 0),
+      radial-gradient(circle at 30% 30%, var(--px-red) 60%, transparent 60%) 0 0/50% 50% no-repeat,
+      radial-gradient(circle at 70% 30%, var(--px-red) 60%, transparent 60%) 100% 0/50% 50% no-repeat;
+    image-rendering:pixelated;animation:beat 1s ease-in-out infinite;}
+  @keyframes beat{0%,100%{transform:scale(1);}30%{transform:scale(1.25);}}
+
+  /* ---------- arrival state ---------- */
+  .arrived h1{animation:none;}
+  .footer{margin-top:54px;font-size:12px;color:var(--muted);letter-spacing:.05em;
+    opacity:0;animation:rise 1s 1.15s forwards;}
+  .footer span{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div id="fireworks"></div>
+
+<!-- generic fairytale castle silhouette (no trademarked designs) -->
+<svg id="castle" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <g fill="#0b0820">
+    <rect x="120" y="200" width="660" height="120"/>
+    <rect x="180" y="150" width="120" height="170"/>
+    <rect x="600" y="150" width="120" height="170"/>
+    <rect x="360" y="110" width="180" height="210"/>
+    <rect x="410" y="40" width="80" height="280"/>
+    <polygon points="180,150 240,80 300,150"/>
+    <polygon points="600,150 660,80 720,150"/>
+    <polygon points="360,110 450,30 540,110"/>
+    <polygon points="410,40 450,-20 490,40"/>
+    <rect x="40" y="240" width="60" height="80"/>
+    <polygon points="40,240 70,200 100,240"/>
+    <rect x="800" y="240" width="60" height="80"/>
+    <polygon points="800,240 830,200 860,240"/>
+  </g>
+  <g fill="#ffd35c" opacity=".9">
+    <rect x="440" y="120" width="20" height="34" rx="9"/>
+    <rect x="232" y="220" width="16" height="26" rx="7"/>
+    <rect x="652" y="220" width="16" height="26" rx="7"/>
+  </g>
+</svg>
+
+<div class="wrap" id="wrap">
+  <div class="eyebrow">The countdown to magic</div>
+  <h1>The Garcia Family Adventure</h1>
+  <p class="sub">Walt Disney World &nbsp;·&nbsp; <b>November 21&ndash;28, 2026</b></p>
+
+  <div class="countdown" id="cd">
+    <div class="unit"><div class="num" id="d">--</div><div class="lbl">Days</div></div>
+    <div class="unit"><div class="num" id="h">--</div><div class="lbl">Hours</div></div>
+    <div class="unit"><div class="num" id="m">--</div><div class="lbl">Minutes</div></div>
+    <div class="unit" id="secUnit"><div class="num" id="s">--</div><div class="lbl">Seconds</div></div>
+  </div>
+  <p class="leavemsg">until we start the road trip on the <b>morning of Nov 20</b> ✨</p>
+
+  <div class="progress-wrap">
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="ptext" id="ptext">The journey begins…</div>
+  </div>
+
+  <div class="strip">
+    <div class="chip"><span class="ico">🏨</span> Disney's All-Star Sports Resort</div>
+    <div class="chip"><span class="ico">🗓️</span> 7 nights of magic</div>
+    <div class="chip"><span class="ico">🎆</span> Parks, fireworks &amp; more</div>
+  </div>
+
+  <!-- ===================== SIDE QUEST ===================== -->
+  <div class="quest">
+    <div class="quest-tag">★ SIDE QUEST <span class="blink">▶</span></div>
+    <h2>UNIVERSAL STUDIOS DAY</h2>
+    <p>One day we warp over to <span class="hl">Universal</span> to take <span class="hl">Johnny</span>
+       into the video-game world of <span class="hl">Super Nintendo Land</span> — power-ups,
+       high scores, and a whole new realm to explore. <em>(Day to be picked!)</em></p>
+    <div class="pixrow">
+      <div class="coin"></div><div class="coin"></div><div class="coin"></div>
+      <div class="pheart"></div>
+    </div>
+  </div>
+
+  <div class="footer">Made with love &amp; <span>fairy dust</span> — see you in November, Garcia family</div>
+</div>
+
+<script>
+  // ===== EDIT HERE (months are 1–12, like a normal calendar) =====
+  const TRIP  = { year:2026, month:11, day:20, hour:8,  minute:0 };  // departure morning
+  const START = { year:2026, month:6,  day:1,  hour:0,  minute:0 };  // when the countdown began
+  // ===============================================================
+
+  const target = new Date(TRIP.year, TRIP.month-1, TRIP.day, TRIP.hour, TRIP.minute, 0);
+  const start  = new Date(START.year, START.month-1, START.day, START.hour, START.minute, 0);
+
+  const $ = id => document.getElementById(id);
+  let lastSec = -1;
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function update(){
+    const now = new Date();
+    let diff = target - now;
+
+    if(diff <= 0){
+      $('cd').innerHTML = '<div class="num" style="font-family:\'Cinzel Decorative\';font-size:clamp(28px,6vw,56px)">The adventure begins! 🎉</div>';
+      $('fill').style.width = '100%';
+      $('ptext').textContent = 'Have a magical trip!';
+      document.querySelector('.leavemsg').innerHTML = '<b>It\u2019s time — go make memories!</b>';
+      return false;
+    }
+
+    const days = Math.floor(diff/86400000); diff -= days*86400000;
+    const hrs  = Math.floor(diff/3600000);  diff -= hrs*3600000;
+    const mins = Math.floor(diff/60000);    diff -= mins*60000;
+    const secs = Math.floor(diff/1000);
+
+    $('d').textContent = days;
+    $('h').textContent = pad(hrs);
+    $('m').textContent = pad(mins);
+    $('s').textContent = pad(secs);
+
+    if(secs !== lastSec){
+      const u = $('secUnit'); u.classList.add('tick');
+      setTimeout(()=>u.classList.remove('tick'),140);
+      lastSec = secs;
+    }
+
+    const total = target - start;
+    const done  = now - start;
+    const pct = Math.max(0, Math.min(100, (done/total)*100));
+    $('fill').style.width = pct.toFixed(1) + '%';
+    $('ptext').textContent = pct.toFixed(1) + '% of the wait complete';
+    return true;
+  }
+
+  // starfield
+  (function(){
+    const box = $('stars'); const frag = document.createDocumentFragment();
+    for(let i=0;i<140;i++){
+      const s = document.createElement('div'); s.className='star';
+      const sz = Math.random()*2.4+0.6;
+      s.style.width=s.style.height=sz+'px';
+      s.style.left=Math.random()*100+'%';
+      s.style.top=Math.random()*72+'%';
+      s.style.setProperty('--dur',(Math.random()*3+1.6)+'s');
+      s.style.animationDelay=(Math.random()*3)+'s';
+      frag.appendChild(s);
+    }
+    box.appendChild(frag);
+  })();
+
+  // fireworks
+  const COLORS=['#ffd35c','#ff5fa2','#7ec8ff','#9dff8a','#ffb05e','#ffffff'];
+  function firework(){
+    const box=$('fireworks');
+    const cx=(Math.random()*70+15)/100*innerWidth;
+    const cy=(Math.random()*40+8)/100*innerHeight;
+    const color=COLORS[Math.floor(Math.random()*COLORS.length)];
+    const n=26;
+    for(let i=0;i<n;i++){
+      const p=document.createElement('div'); p.className='spark';
+      p.style.left=cx+'px'; p.style.top=cy+'px';
+      p.style.background=color; p.style.boxShadow='0 0 8px '+color;
+      const ang=(Math.PI*2*i)/n; const dist=Math.random()*90+60;
+      p.style.setProperty('--tx',Math.cos(ang)*dist+'px');
+      p.style.setProperty('--ty',Math.sin(ang)*dist+'px');
+      box.appendChild(p);
+      setTimeout(()=>p.remove(),1150);
+    }
+  }
+
+  if(update()){
+    setInterval(update,250);
+    setInterval(firework,2600);
+    setTimeout(firework,900);
+  }
+</script>
+</body>
+</html>

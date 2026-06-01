@@ -1,0 +1,15 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Netlify CLI (created locally if you ever use it)
+.netlify/
+
+# Node (only relevant if you add build tooling later)
+node_modules/
